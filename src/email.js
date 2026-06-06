@@ -43,6 +43,31 @@ function changeCell(label, change) {
     </td>`;
 }
 
+// Pure HTML/CSS sparkline: a row of height-scaled bars (no SVG/remote image, so
+// it renders in Gmail/Apple/Zoho alike). Coloured by overall direction.
+function sparkline(series) {
+  if (!Array.isArray(series) || series.length < 2) return '';
+  const pts = series.slice(-30);
+  const min = Math.min(...pts);
+  const max = Math.max(...pts);
+  const range = max - min || 1;
+  const H = 40; // track height (px)
+  const up = pts[pts.length - 1] >= pts[0];
+  const color = up ? '#22c55e' : '#f43f5e';
+
+  const bars = pts
+    .map((v) => {
+      const h = Math.max(3, Math.round(((v - min) / range) * (H - 3)) + 3);
+      return `<td valign="bottom" style="padding:0 1px;"><div style="height:${h}px;background:${color};border-radius:1px;font-size:0;line-height:0;">&nbsp;</div></td>`;
+    })
+    .join('');
+
+  return `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;table-layout:fixed;height:${H}px;">
+          <tr>${bars}</tr>
+        </table>`;
+}
+
 function coinCard(row) {
   const zone = rsiZone(row.rsi);
   const rsiVal = row.rsi == null ? '—' : row.rsi.toFixed(0);
@@ -85,6 +110,9 @@ function coinCard(row) {
             </td>
           </tr>
         </table>
+
+        <!-- sparkline (30-day trend) -->
+        ${sparkline(row.spark)}
 
         <!-- changes -->
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;">
@@ -130,7 +158,7 @@ export function renderHTML(report) {
         <!-- footer -->
         <tr><td style="padding:6px 8px 0 8px;">
           <div style="font:400 11px/1.6 -apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#475569;">
-            Prices &amp; % changes from CoinGecko · RSI(14) computed on daily closes ·
+            Prices &amp; % changes from CoinGecko · RSI(14) &amp; 30-day sparkline on daily closes ·
             <span style="color:#22c55e;">green</span>/<span style="color:#f43f5e;">red</span> = up/down ·
             RSI zones: &le;30 oversold, &ge;70 overbought · next update in ~6h.
           </div>

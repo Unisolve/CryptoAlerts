@@ -9,11 +9,12 @@ async function buildReport() {
   for (const coin of COINS) {
     const m = markets[coin.id];
     let rsi = null;
+    let closes = [];
     try {
-      const closes = await fetchDailyCloses(coin.id, 100);
+      closes = await fetchDailyCloses(coin.id, 100);
       rsi = computeRSI(closes, 14);
     } catch (err) {
-      console.error(`RSI fetch failed for ${coin.id}: ${err?.message ?? err}`);
+      console.error(`RSI/history fetch failed for ${coin.id}: ${err?.message ?? err}`);
     }
     await sleep(400); // be gentle with the keyless rate limit
 
@@ -26,6 +27,7 @@ async function buildReport() {
       ch7d: m?.price_change_percentage_7d_in_currency ?? null,
       ch30d: m?.price_change_percentage_30d_in_currency ?? null,
       rsi,
+      spark: closes.slice(-30), // last 30 daily closes for the sparkline
     });
   }
 
