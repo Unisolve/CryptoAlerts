@@ -27,7 +27,7 @@ async function buildReport() {
       ch7d: m?.price_change_percentage_7d_in_currency ?? null,
       ch30d: m?.price_change_percentage_30d_in_currency ?? null,
       rsi,
-      spark: closes.slice(-30), // last 30 daily closes for the sparkline
+      spark: closes.slice(-31), // 30 shown bars + 1 prior day for day-over-day colour
     });
   }
 
