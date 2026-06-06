@@ -1,0 +1,13 @@
+{
+  "name": "cryptoalerts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Periodic crypto price + RSI email alerts",
+  "scripts": {
+    "once": "node src/index.js"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.14"
+  }
+}
